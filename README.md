@@ -65,7 +65,7 @@ transformation.
 uv sync
 uv run playwright install chromium          # server: add --with-deps
 cp .env.example .env                          # fill secrets
-uv run uvicorn src.main:app --host 127.0.0.1 --port 3203   # implicit workers=1
+./scripts/run-service.sh                      # uvicorn 127.0.0.1:3203, workers=1 pinned
 uv run pytest                                 # unit suite
 ./test-scripts/test-export-pdf-worker.sh      # integration bookend
 ```
