@@ -63,17 +63,28 @@ transformation.
 
 ```bash
 uv sync
-uv run playwright install chromium          # server: add --with-deps
+uv run playwright install chromium-headless-shell   # server: --with-deps chromium (needs sudo)
 cp .env.example .env                          # fill secrets
 ./scripts/run-service.sh                      # uvicorn 127.0.0.1:3203, workers=1 pinned
 uv run pytest                                 # unit suite
 ./test-scripts/test-export-pdf-worker.sh      # integration bookend
 ```
 
+**⚠️ Re-run `playwright install` after every `playwright` package bump.** Playwright
+resolves the browser from a version-pinned dir in `~/.cache/ms-playwright/`
+(e.g. `chromium_headless_shell-1234/`); after `uv sync` bumps the package the old
+binary is not found and jobs fail at render with `RENDER_CRASH`
+`"chromium launch failed: Executable doesn't exist at ..."` (prod incident
+2026-08-17). Install under the same user the service runs as (cache is per-`$HOME`).
+No restart needed — the binary is resolved at browser launch. Verify:
+`curl -s localhost:3203/healthz` → `chromium_ok: true`.
+
 ## Deploy
 
 Independent **systemd** unit (restart decoupled from python-api — the motivation
-for the split). `uv sync` + `playwright install --with-deps chromium`, bind
+for the split). `uv sync` + `playwright install --with-deps chromium` (repeat the
+install on every playwright bump — see warning in Run; smoke-test
+`/healthz` → `chromium_ok` after each deploy), bind
 `127.0.0.1:3203`, **single worker** (never scale the uvicorn worker count — the
 queue/registry are in-process). Host has 32 GB RAM; NOT Cloud Run (ADR-033
 constraint unchanged). Local gitlink only — no GitHub remote in v1.
