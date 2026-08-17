@@ -1,0 +1,30 @@
+[project]
+name = "storybook-export-pdf-worker"
+version = "0.1.0"
+description = "Storybook Export-PDF Worker (ADR-055) — headless Chromium capture → ICC CMYK → PDF/X compute worker extracted from python-api. FastAPI, in-memory FIFO queue, workers=1. No DB, no Supabase, no AI."
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "fastapi>=0.128.0",
+    "uvicorn[standard]>=0.40.0",
+    "pydantic>=2.10.0",
+    "pydantic-settings>=2.12.0",
+    "httpx>=0.28.1",
+    "playwright>=1.49.0",
+    "pillow>=10.4.0",
+    "pikepdf>=9.0.0",
+    "pypdf>=5.0.0",
+    "pyjwt[crypto]>=2.10.0",
+]
+
+[dependency-groups]
+dev = [
+    "pytest>=9.0.2",
+    "pytest-asyncio>=1.3.0",
+]
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+asyncio_default_fixture_loop_scope = "function"
+testpaths = ["tests"]
+pythonpath = ["."]
